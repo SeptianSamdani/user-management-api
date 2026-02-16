@@ -1,211 +1,317 @@
-# User Management API
+# 🚀 User Management API
 
-A production-ready REST API with authentication, authorization, and user management built with Node.js, TypeScript, Express, PostgreSQL, and Prisma.
+API backend untuk manajemen user dengan fitur autentikasi, otorisasi, dan CRUD user lengkap. Dibangun dengan Node.js, TypeScript, Express, PostgreSQL, dan Prisma.
 
-## Features
+## 📋 Daftar Isi
 
-### Authentication
-- ✅ User registration with email verification
-- ✅ Login with JWT (access & refresh tokens)
-- ✅ Email verification
-- ✅ Password reset flow
-- ✅ Secure password hashing (bcrypt)
+- [Fitur](#-fitur)
+- [Tech Stack](#-tech-stack)
+- [Prerequisite](#-prerequisite)
+- [Instalasi](#-instalasi)
+- [Konfigurasi](#-konfigurasi)
+- [Menjalankan Aplikasi](#-menjalankan-aplikasi)
+- [API Endpoints](#-api-endpoints)
+- [Testing dengan Postman](#-testing-dengan-postman)
+- [Database Schema](#-database-schema)
+- [Troubleshooting](#-troubleshooting)
 
-### Authorization (RBAC)
-- ✅ Role-based access control (Admin/User)
-- ✅ Protected routes with JWT middleware
+## ✨ Fitur
 
-### User Management (Admin Only)
-- ✅ List all users (with pagination, filtering, search)
-- ✅ Get user by ID
-- ✅ Update user details
-- ✅ Delete user
-- ✅ Change user role
-- ✅ Activate/deactivate user
+### Authentication (Autentikasi)
+- ✅ Register user baru dengan validasi
+- ✅ Login dengan JWT (Access & Refresh Token)
+- ✅ Verifikasi email
+- ✅ Reset password via email
+- ✅ Password hashing dengan bcrypt
 
-### User Profile
-- ✅ Get own profile
-- ✅ Update own profile
-- ✅ Change password
+### Authorization (Otorisasi)
+- ✅ Role-based access control (RBAC)
+- ✅ 2 Role: Admin dan User
+- ✅ Protected routes dengan JWT middleware
 
-## Tech Stack
+### User Management (Khusus Admin)
+- ✅ Lihat semua user (dengan pagination & filter)
+- ✅ Lihat detail user by ID
+- ✅ Update data user
+- ✅ Hapus user
+- ✅ Ubah role user (Admin/User)
+- ✅ Aktifkan/nonaktifkan user
 
-- **Runtime**: Node.js
-- **Language**: TypeScript
-- **Framework**: Express.js
-- **Database**: PostgreSQL
-- **ORM**: Prisma
-- **Authentication**: JWT (jsonwebtoken)
-- **Validation**: Zod
-- **Email**: Nodemailer
-- **Security**: Helmet, bcryptjs, rate-limiting
+### User Profile (Untuk Semua User)
+- ✅ Lihat profile sendiri
+- ✅ Update profile sendiri
+- ✅ Ganti password
 
-## Project Structure
+## 🛠 Tech Stack
 
-```
-src/
-├── config/          # Configuration files
-├── controllers/     # Route controllers
-├── middlewares/     # Custom middlewares
-├── routes/          # API routes
-├── services/        # Business logic
-├── types/           # TypeScript types
-├── utils/           # Utility functions
-├── validators/      # Request validation schemas
-├── app.ts           # Express app setup
-└── server.ts        # Server entry point
-```
+- **Runtime:** Node.js v18+
+- **Language:** TypeScript
+- **Framework:** Express.js v5
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Authentication:** JWT (jsonwebtoken)
+- **Validation:** Zod
+- **Email:** Nodemailer + Mailtrap (development)
+- **Security:** Helmet, bcryptjs, rate-limiting
 
-## Getting Started
+## 📦 Prerequisite
 
-### Prerequisites
+Pastikan sudah terinstall:
 
-- Node.js (v18 or higher)
-- PostgreSQL (v14 or higher)
-- npm or yarn
+- **Node.js** (v18 atau lebih baru) - [Download](https://nodejs.org/)
+- **PostgreSQL** (v14 atau lebih baru) - [Download](https://www.postgresql.org/download/)
+- **Git** - [Download](https://git-scm.com/)
+- **Postman** (opsional, untuk testing) - [Download](https://www.postman.com/)
 
-### Installation
+## 🚀 Instalasi
 
-1. Clone the repository:
+### 1. Clone Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/SeptianSamdani/user-management-api.git
 cd user-management-api
 ```
 
-2. Install dependencies:
+### 2. Install Dependencies
 ```bash
 npm install
 ```
 
-3. Set up environment variables:
+### 3. Setup Database PostgreSQL
+
+**Buat database baru:**
+```bash
+# Login ke PostgreSQL
+psql -U postgres
+
+# Buat database
+CREATE DATABASE user_management_db;
+
+# Keluar dari psql
+\q
+```
+
+**Atau pakai GUI seperti pgAdmin atau DBeaver**
+
+### 4. Setup Environment Variables
+
+Copy file `.env.example` menjadi `.env`:
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your configuration:
+Edit file `.env` dan sesuaikan dengan konfigurasi kamu:
 ```env
+# Server
+NODE_ENV=development
+PORT=3000
+
+# Database - Sesuaikan username & password PostgreSQL kamu
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/user_management_db?schema=public"
-JWT_ACCESS_SECRET=your-super-secret-key
-JWT_REFRESH_SECRET=your-refresh-secret-key
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
+
+# JWT - Ganti dengan string random yang kuat
+JWT_ACCESS_SECRET=ganti-dengan-string-random-yang-panjang
+JWT_REFRESH_SECRET=ganti-dengan-string-random-yang-berbeda
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+# Email - Mailtrap (untuk development)
+# Daftar di https://mailtrap.io lalu copy credentials
+SMTP_HOST=sandbox.smtp.mailtrap.io
+SMTP_PORT=2525
+SMTP_USER=your-mailtrap-username
+SMTP_PASSWORD=your-mailtrap-password
+EMAIL_FROM=noreply@usermanagement.com
+
+# Frontend URL
+FRONTEND_URL=http://localhost:3000
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
 ```
 
-4. Start PostgreSQL (with Docker):
+### 5. Generate Prisma Client & Migrate Database
 ```bash
-docker-compose up -d
-```
-
-5. Run Prisma migrations:
-```bash
-npx prisma migrate dev --name init
+# Generate Prisma Client
 npx prisma generate
+
+# Jalankan migration (buat tabel di database)
+npx prisma migrate dev --name init
 ```
 
-6. Start development server:
+## ⚙️ Konfigurasi
+
+### Setup Mailtrap (Email Testing)
+
+1. **Daftar** di [Mailtrap.io](https://mailtrap.io) (gratis)
+2. **Login** dan buka dashboard
+3. Pilih **Email Testing** → **Inboxes**
+4. Copy **SMTP credentials** (username & password)
+5. Paste ke file `.env`:
+```env
+   SMTP_USER=your-mailtrap-username
+   SMTP_PASSWORD=your-mailtrap-password
+```
+
+**Kenapa Mailtrap?**
+- Email tidak benar-benar terkirim
+- Semua email tertangkap di inbox Mailtrap
+- Bisa test tampilan email
+- Gratis dan mudah
+
+### Generate JWT Secret (Opsional tapi Recommended)
+```bash
+# Generate random string untuk JWT secret
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Copy hasilnya dan paste ke `.env` sebagai `JWT_ACCESS_SECRET` dan `JWT_REFRESH_SECRET`
+
+## 🎮 Menjalankan Aplikasi
+
+### Development Mode (dengan auto-reload)
 ```bash
 npm run dev
 ```
 
-The API will be available at `http://localhost:3000`
+Server akan berjalan di: **http://localhost:3000**
 
-## API Endpoints
-
-### Authentication
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/register` | Register new user | No |
-| POST | `/api/auth/login` | Login user | No |
-| POST | `/api/auth/verify-email` | Verify email | No |
-| POST | `/api/auth/forgot-password` | Request password reset | No |
-| POST | `/api/auth/reset-password` | Reset password | No |
-| GET | `/api/auth/profile` | Get own profile | Yes |
-
-### User (Authenticated)
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| PUT | `/api/user/profile` | Update own profile | Yes |
-| PATCH | `/api/user/profile/password` | Change password | Yes |
-
-### Admin (Admin Only)
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/admin/users` | List all users | Admin |
-| GET | `/api/admin/users/:id` | Get user by ID | Admin |
-| PUT | `/api/admin/users/:id` | Update user | Admin |
-| DELETE | `/api/admin/users/:id` | Delete user | Admin |
-| PATCH | `/api/admin/users/:id/role` | Change user role | Admin |
-| PATCH | `/api/admin/users/:id/status` | Toggle user status | Admin |
-
-## API Examples
-
-### Register User
+### Production Mode
 ```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "Password123",
-    "name": "John Doe"
-  }'
+# Build TypeScript ke JavaScript
+npm run build
+
+# Jalankan production server
+npm start
 ```
 
-### Login
+### Buka Prisma Studio (Database GUI)
 ```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "Password123"
-  }'
+npx prisma studio
 ```
 
-### Get Users (Admin)
-```bash
-curl -X GET "http://localhost:3000/api/admin/users?page=1&limit=10" \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+Browser akan terbuka di **http://localhost:5555**
+
+## 📡 API Endpoints
+
+Base URL: `http://localhost:3000/api`
+
+### 🔐 Authentication
+
+| Method | Endpoint | Deskripsi | Auth Required |
+|--------|----------|-----------|---------------|
+| POST | `/auth/register` | Daftar user baru | ❌ |
+| POST | `/auth/login` | Login user | ❌ |
+| POST | `/auth/verify-email` | Verifikasi email | ❌ |
+| POST | `/auth/forgot-password` | Request reset password | ❌ |
+| POST | `/auth/reset-password` | Reset password | ❌ |
+| GET | `/auth/profile` | Lihat profile sendiri | ✅ |
+
+### 👤 User (Authenticated)
+
+| Method | Endpoint | Deskripsi | Auth Required |
+|--------|----------|-----------|---------------|
+| PUT | `/user/profile` | Update profile sendiri | ✅ User |
+| PATCH | `/user/profile/password` | Ganti password | ✅ User |
+
+### 👑 Admin (Admin Only)
+
+| Method | Endpoint | Deskripsi | Auth Required |
+|--------|----------|-----------|---------------|
+| GET | `/admin/users` | Lihat semua user | ✅ Admin |
+| GET | `/admin/users/:id` | Lihat user by ID | ✅ Admin |
+| PUT | `/admin/users/:id` | Update user | ✅ Admin |
+| DELETE | `/admin/users/:id` | Hapus user | ✅ Admin |
+| PATCH | `/admin/users/:id/role` | Ubah role user | ✅ Admin |
+| PATCH | `/admin/users/:id/status` | Aktifkan/nonaktifkan user | ✅ Admin |
+
+### 🏥 Health Check
+
+| Method | Endpoint | Deskripsi |
+|--------|----------|-----------|
+| GET | `/health` | Cek status server |
+
+## 🧪 Testing dengan Postman
+
+### Import Collection
+
+1. Buka Postman
+2. Click **Import**
+3. Pilih file `postman_collection.json` dari root project
+4. Collection akan muncul dengan nama **"User Management API"**
+
+### Setup Variables
+
+1. Click collection name
+2. Tab **Variables**
+3. Set values:
+   - `baseUrl` = `http://localhost:3000`
+   - `accessToken` = (kosongkan dulu)
+
+### Flow Testing
+
+#### 1. Register User
+
+**Endpoint:** `POST /api/auth/register`
+```json
+{
+  "email": "admin@test.com",
+  "password": "Admin123",
+  "name": "Admin User"
+}
 ```
 
-## Environment Variables
+#### 2. Verify Email
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `NODE_ENV` | Environment | `development` |
-| `PORT` | Server port | `3000` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://...` |
-| `JWT_ACCESS_SECRET` | JWT access token secret | `your-secret` |
-| `JWT_REFRESH_SECRET` | JWT refresh token secret | `your-secret` |
-| `SMTP_HOST` | Email SMTP host | `smtp.gmail.com` |
-| `SMTP_PORT` | Email SMTP port | `587` |
-| `SMTP_USER` | Email username | `user@gmail.com` |
-| `SMTP_PASSWORD` | Email password | `app-password` |
-
-## Scripts
-
-```bash
-# Development
-npm run dev              # Start dev server with hot reload
-
-# Production
-npm run build            # Build TypeScript
-npm start                # Start production server
-
-# Database
-npm run prisma:generate  # Generate Prisma client
-npm run prisma:migrate   # Run migrations
-npm run prisma:studio    # Open Prisma Studio
-
-# Testing
-npm test                 # Run tests
+- Buka **Mailtrap inbox**
+- Copy verification token dari email
+- **Endpoint:** `POST /api/auth/verify-email`
+```json
+{
+  "token": "token-dari-email"
+}
 ```
 
-## Database Schema
+#### 3. Set User sebagai Admin
+```bash
+# Buka Prisma Studio
+npx prisma studio
 
+# Edit user:
+# - role: ADMIN
+# - isVerified: true
+```
+
+#### 4. Login
+
+**Endpoint:** `POST /api/auth/login`
+```json
+{
+  "email": "admin@test.com",
+  "password": "Admin123"
+}
+```
+
+**Copy `accessToken` dari response!**
+
+#### 5. Set Token di Postman
+
+1. Click collection name
+2. Tab **Variables**
+3. Paste token ke `accessToken`
+4. Save
+
+#### 6. Test Protected Endpoints
+
+Sekarang bisa test semua endpoint yang butuh authentication:
+
+- Get Profile
+- Update Profile
+- Get All Users (Admin)
+- Update User (Admin)
+- dll.
+
+## 🗄 Database Schema
 ```prisma
 model User {
   id                String    @id @default(uuid())
@@ -220,6 +326,8 @@ model User {
   resetTokenExpiry  DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+
+  @@map("users")
 }
 
 enum Role {
@@ -228,54 +336,187 @@ enum Role {
 }
 ```
 
-## Security Features
+## 🔒 Security Features
 
-- Password hashing with bcrypt
-- JWT authentication
-- Rate limiting
-- Helmet security headers
-- CORS protection
-- Input validation with Zod
-- SQL injection protection (Prisma ORM)
+- ✅ Password hashing dengan bcrypt (10 rounds)
+- ✅ JWT authentication dengan expiry
+- ✅ Rate limiting (100 requests per 15 menit)
+- ✅ Helmet untuk security headers
+- ✅ CORS protection
+- ✅ Input validation dengan Zod
+- ✅ SQL injection protection (Prisma ORM)
+- ✅ XSS protection
 
-## Deployment
+## 🐛 Troubleshooting
 
-### Railway / Render / Vercel
+### Error: Can't connect to database
 
-1. Push code to GitHub
-2. Connect repository to platform
-3. Set environment variables
-4. Deploy!
-
-### Docker (Optional)
-
+**Solusi:**
 ```bash
-# Build image
-docker build -t user-management-api .
+# Pastikan PostgreSQL running
+# Windows: Check di Services
+# Mac: brew services list
+# Linux: sudo systemctl status postgresql
 
-# Run container
-docker run -p 3000:3000 --env-file .env user-management-api
+# Cek DATABASE_URL di .env sudah benar
 ```
 
-## Contributing
+### Error: Module not found
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+**Solusi:**
+```bash
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
 
-## License
+# Generate Prisma Client
+npx prisma generate
+```
 
-MIT
+### Error: Port 3000 already in use
 
-## Next Steps
+**Solusi:**
+```env
+# Ubah PORT di .env
+PORT=3001
+```
 
-- [ ] Add refresh token rotation
-- [ ] Add unit & integration tests
-- [ ] Add API documentation (Swagger)
-- [ ] Add logging (Winston/Pino)
-- [ ] Add Redis for caching
-- [ ] Add file upload feature
-- [ ] Add social auth (Google, GitHub)
-- [ ] Add 2FA authentication
+### Error: Email tidak terkirim
+
+**Solusi:**
+```bash
+# Pastikan credentials Mailtrap sudah benar di .env
+# Login ke Mailtrap.io dan copy ulang credentials
+```
+
+### Error: Invalid token
+
+**Solusi:**
+- Token expired (login ulang)
+- Token salah format (pastikan pakai "Bearer TOKEN")
+- Token tidak di-set di Postman variables
+
+### Error: Prisma migration failed
+
+**Solusi:**
+```bash
+# Reset database (HATI-HATI: data akan hilang!)
+npx prisma migrate reset
+
+# Atau drop database dan buat ulang
+psql -U postgres
+DROP DATABASE user_management_db;
+CREATE DATABASE user_management_db;
+\q
+
+# Jalankan migration ulang
+npx prisma migrate dev --name init
+```
+
+## 📚 Scripts
+```bash
+# Development
+npm run dev              # Jalankan dev server dengan auto-reload
+
+# Production
+npm run build            # Compile TypeScript ke JavaScript
+npm start                # Jalankan production server
+
+# Database
+npm run prisma:generate  # Generate Prisma Client
+npm run prisma:migrate   # Buat migration baru
+npm run prisma:studio    # Buka database GUI
+```
+
+## 📂 Struktur Project
+```
+user-management-api/
+├── prisma/
+│   └── schema.prisma           # Database schema
+├── src/
+│   ├── config/                 # Konfigurasi app
+│   │   ├── database.ts         # Prisma client
+│   │   └── index.ts            # Environment config
+│   ├── controllers/            # Business logic
+│   │   ├── admin.controller.ts
+│   │   ├── auth.controller.ts
+│   │   └── user.controller.ts
+│   ├── middlewares/            # Custom middlewares
+│   │   ├── auth.middleware.ts  # JWT verification
+│   │   ├── authorize.middleware.ts  # Role check
+│   │   ├── error.middleware.ts
+│   │   └── validate.middleware.ts
+│   ├── routes/                 # API routes
+│   │   ├── admin.routes.ts
+│   │   ├── auth.routes.ts
+│   │   └── user.routes.ts
+│   ├── services/               # External services
+│   │   └── email.service.ts
+│   ├── types/                  # TypeScript types
+│   │   └── index.ts
+│   ├── utils/                  # Utility functions
+│   │   ├── errors.ts           # Custom error classes
+│   │   ├── jwt.ts              # JWT helpers
+│   │   ├── password.ts         # Password hashing
+│   │   └── token.ts            # Token generator
+│   ├── validators/             # Input validation
+│   │   └── auth.validator.ts
+│   ├── app.ts                  # Express app setup
+│   └── server.ts               # Server entry point
+├── .env                        # Environment variables (jangan di-commit!)
+├── .env.example                # Template environment
+├── .gitignore
+├── package.json
+├── postman_collection.json     # Postman collection
+├── README.md
+└── tsconfig.json               # TypeScript config
+```
+
+## 🎓 Konsep yang Dipelajari
+
+Project ini mencakup konsep-konsep penting:
+
+1. **REST API Design** - Endpoint yang terstruktur
+2. **Authentication & Authorization** - JWT, role-based access
+3. **Database Design** - Relasi, indexing, migrations
+4. **TypeScript** - Type safety, interfaces
+5. **Security** - Password hashing, rate limiting, validation
+6. **Error Handling** - Custom errors, error middleware
+7. **Email Service** - SMTP, HTML templates
+8. **Environment Config** - Environment variables
+9. **API Testing** - Postman collection
+
+## 🚀 Next Steps & Improvements
+
+Fitur yang bisa ditambahkan:
+
+- [ ] Refresh token rotation
+- [ ] Unit & integration tests (Jest)
+- [ ] API documentation (Swagger/OpenAPI)
+- [ ] Logging system (Winston/Pino)
+- [ ] Redis caching
+- [ ] File upload (avatar)
+- [ ] Social authentication (Google, GitHub)
+- [ ] Two-factor authentication (2FA)
+- [ ] Audit log
+- [ ] Soft delete users
+
+## 📄 License
+
+MIT License - Silakan digunakan untuk belajar!
+
+## 👨‍💻 Author
+
+**Septian Samdani**
+- GitHub: [@SeptianSamdani](https://github.com/SeptianSamdani)
+
+## 🙏 Acknowledgments
+
+- [Prisma](https://www.prisma.io/) - Modern database toolkit
+- [Express.js](https://expressjs.com/) - Web framework
+- [Mailtrap](https://mailtrap.io/) - Email testing
+- [PostgreSQL](https://www.postgresql.org/) - Database
+
+---
+
+⭐ Jangan lupa kasih star kalau project ini membantu kamu belajar!
