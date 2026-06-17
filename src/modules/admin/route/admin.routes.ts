@@ -6,7 +6,7 @@ import {
   deleteUser,
   changeUserRole,
   toggleUserStatus,
-} from '../controllers/admin.controller';
+} from '../controller/admin.controller';
 import { authenticate } from '../../../middlewares/auth.middleware';
 import { authorize } from '../../../middlewares/authorize.middleware';
 import { validate } from '../../../middlewares/validate.middleware';

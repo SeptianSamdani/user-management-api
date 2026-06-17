@@ -7,7 +7,7 @@ import {
   resetPassword,
   getProfile,
   refreshToken,
-} from '../../../controllers/auth.controller';
+} from '../controller/auth.controller';
 import { authenticate } from '../../../middlewares/auth.middleware';
 import { validate } from '../../../middlewares/validate.middleware';
 import {
@@ -17,7 +17,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   refreshTokenSchema,
-} from '../../../validators/auth.validator';
+} from '../validator/auth.validator';
 
 const router = Router();
 

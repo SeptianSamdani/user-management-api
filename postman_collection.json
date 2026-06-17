@@ -129,6 +129,22 @@
               "path": ["api", "auth", "profile"]
             }
           }
+        }, 
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh-token"]
+            }
+          }
         }
       ]
     },
@@ -329,6 +345,10 @@
     {
       "key": "accessToken",
       "value": "YOUR_ACCESS_TOKEN"
+    }, 
+    { 
+      "key": "refreshToken", 
+      "value": "YOUR_REFRESH_TOKEN" 
     }
   ]
 }
