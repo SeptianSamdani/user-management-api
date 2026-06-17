@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../config/database';
-import { hashPassword, comparePassword } from '../utils/password';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
-import { generateTokenWithExpiry } from '../utils/token';
-import { sendVerificationEmail, sendPasswordResetEmail } from '../services/email.service';
-import { BadRequestError, UnauthorizedError, NotFoundError } from '../utils/errors';
-import { AuthenticatedRequest, RegisterDTO, LoginDTO } from '../types';
+import { prisma } from '../../../config/database';
+import { hashPassword, comparePassword } from '../../../utils/password';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../../../utils/jwt';
+import { generateTokenWithExpiry } from '../../../utils/token';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../../../services/email.service';
+import { BadRequestError, UnauthorizedError, NotFoundError } from '../../../utils/errors';
+import { AuthenticatedRequest, RegisterDTO, LoginDTO } from '../../../types';
 
 export const register = async (
   req: Request,
@@ -243,5 +243,33 @@ export const getProfile = async (
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { refreshToken } = req.body;
+    const decoded = verifyRefreshToken(refreshToken);
+
+    const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+    if (!user || !user.isActive) {
+      throw new UnauthorizedError('Invalid refresh token');
+    }
+
+    const payload = { userId: user.id, email: user.email, role: user.role };
+    const newAccessToken = generateAccessToken(payload);
+    const newRefreshToken = generateRefreshToken(payload);
+
+    res.json({
+      success: true,
+      message: 'Token refreshed successfully',
+      data: { accessToken: newAccessToken, refreshToken: newRefreshToken },
+    });
+  } catch (error) {
+    next(new UnauthorizedError('Invalid or expired refresh token'));
   }
 };

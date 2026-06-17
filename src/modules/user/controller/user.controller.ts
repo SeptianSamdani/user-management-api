@@ -1,8 +1,8 @@
 import { Response, NextFunction } from 'express';
-import { prisma } from '../config/database';
-import { hashPassword, comparePassword } from '../utils/password';
-import { BadRequestError, NotFoundError } from '../utils/errors';
-import { AuthenticatedRequest, UpdateProfileDTO, ChangePasswordDTO } from '../types';
+import { prisma } from '../../../config/database';
+import { hashPassword, comparePassword } from '../../../utils/password';
+import { BadRequestError, NotFoundError } from '../../../utils/errors';
+import { AuthenticatedRequest, UpdateProfileDTO, ChangePasswordDTO } from '../../../types';
 
 export const updateProfile = async (
   req: AuthenticatedRequest,

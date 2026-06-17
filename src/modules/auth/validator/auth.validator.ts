@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Role } from '../types';
+import { Role } from '../../../types';
 
 export const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -56,3 +56,7 @@ export const resetPasswordSchema = z.object({
 export const verifyEmailSchema = z.object({
   token: z.string().min(1, 'Token is required'),
 });
+
+export const refreshTokenSchema = z.object({
+  refreshToken: z.string().min(1, 'Refresh token is required.'), 
+}); 

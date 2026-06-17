@@ -7,11 +7,11 @@ import {
   changeUserRole,
   toggleUserStatus,
 } from '../controllers/admin.controller';
-import { authenticate } from '../middlewares/auth.middleware';
-import { authorize } from '../middlewares/authorize.middleware';
-import { validate } from '../middlewares/validate.middleware';
-import { updateUserSchema } from '../validators/auth.validator';
-import { Role } from '../types';
+import { authenticate } from '../../../middlewares/auth.middleware';
+import { authorize } from '../../../middlewares/authorize.middleware';
+import { validate } from '../../../middlewares/validate.middleware';
+import { updateUserSchema } from '../../auth/validator/auth.validator';
+import { Role } from '../../../types';
 
 const router = Router();
 

@@ -6,16 +6,18 @@ import {
   forgotPassword,
   resetPassword,
   getProfile,
-} from '../controllers/auth.controller';
-import { authenticate } from '../middlewares/auth.middleware';
-import { validate } from '../middlewares/validate.middleware';
+  refreshToken,
+} from '../../../controllers/auth.controller';
+import { authenticate } from '../../../middlewares/auth.middleware';
+import { validate } from '../../../middlewares/validate.middleware';
 import {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
-} from '../validators/auth.validator';
+  refreshTokenSchema,
+} from '../../../validators/auth.validator';
 
 const router = Router();
 
@@ -25,6 +27,7 @@ router.post('/login', validate(loginSchema), login);
 router.post('/verify-email', validate(verifyEmailSchema), verifyEmail);
 router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
 router.post('/reset-password', validate(resetPasswordSchema), resetPassword);
+router.post('/refresh-token', validate(refreshTokenSchema), refreshToken);
 
 // Protected routes
 router.get('/profile', authenticate, getProfile);

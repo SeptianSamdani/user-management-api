@@ -1,10 +1,7 @@
 import { Request } from 'express';
+import { Role } from '@prisma/client';
 
-// Define Role enum locally
-export enum Role {
-  ADMIN = 'ADMIN',
-  USER = 'USER'
-}
+export { Role };
 
 export interface AuthenticatedRequest extends Request {
   user?: {

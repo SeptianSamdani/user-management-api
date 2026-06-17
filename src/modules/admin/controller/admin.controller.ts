@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../config/database';
-import { NotFoundError, BadRequestError } from '../utils/errors';
-import { UpdateUserDTO } from '../types';
-import { Role } from '../types';
+import { prisma } from '../../../config/database';
+import { NotFoundError, BadRequestError } from '../../../utils/errors';
+import { UpdateUserDTO } from '../../../types';
+import { Role } from '../../../types';
 
 export const getAllUsers = async (
     req: Request,
